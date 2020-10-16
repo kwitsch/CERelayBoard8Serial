@@ -1,7 +1,7 @@
-﻿using System;
+﻿using CERelayBoard8Serial.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CERelayBoard8Serial
 {
@@ -9,7 +9,7 @@ namespace CERelayBoard8Serial
     {
         private readonly Lazy<Dictionary<ushort, bool>> _Data;
         public readonly ushort Address;
-        
+        public event EventHandler<RequestSendMessageEventArgs> RequestSendMessage;
         #region Relay
         public bool R1 
         {
@@ -72,6 +72,17 @@ namespace CERelayBoard8Serial
         private void SetData(ushort relay, bool state)
         {
             _Data.Value[relay] = state;
+            CallRequestSendMessage(SendCommand.SET_PORT, DataToByte());
+        }
+
+        private void CallRequestSendMessage(SendCommand command, byte data)
+        {
+            RequestSendMessage?.Invoke(this, new RequestSendMessageEventArgs
+            {
+                Command = command,
+                Address = Address,
+                Data = data,
+            });
         }
 
         #region Converters

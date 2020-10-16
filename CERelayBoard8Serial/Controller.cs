@@ -70,9 +70,16 @@ namespace CERelayBoard8Serial
                 var address = (ushort)args.Data[1];
                 if (!Boards.Value.ContainsKey(address))
                 {
-                    Boards.Value.Add(address, new Board(address));
+                    var b = new Board(address);
+                    b.RequestSendMessage += RequestSendMessage;
+                    Boards.Value.Add(address, b);
                 }
             }
+        }
+
+        private void RequestSendMessage(object sender, RequestSendMessageEventArgs e)
+        {
+            SendMessage(e.Command, e.Address, e.Data);
         }
 
         private void Serial_MessageReceived(object sender, MessageReceivedEventArgs args)
