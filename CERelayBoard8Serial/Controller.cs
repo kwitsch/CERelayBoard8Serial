@@ -1,15 +1,15 @@
-﻿using CERelayBoard8Serial.Utils;
-using SerialPortLibNetCore;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using SerialPortLibNetCore;
+using CERelayBoard8Serial.Utils;
 
 namespace CERelayBoard8Serial
 {
     public class Controller
     {
-        private readonly Lazy<SerialPortInput> _Serial = new Lazy<SerialPortInput>();
+        private readonly Lazy<SerialPortInput> _Serial;
         private readonly WaitForSilence _SilenceWaiter = new WaitForSilence();
         public readonly Lazy<Dictionary<ushort,Board>> Boards = new Lazy<Dictionary<ushort,Board>>();
         private readonly string _Port;
@@ -19,10 +19,10 @@ namespace CERelayBoard8Serial
         {
             _Port = port;
             _Initialized = false;
+            _Serial = new Lazy<SerialPortInput>(new SerialPortInput(new LoggerFactory().CreateLogger<SerialPortInput>()));
         }
 
-
-        public async Task Init()
+        public async Task<bool> Init()
         {
             if (!_Initialized)
             {
@@ -31,19 +31,32 @@ namespace CERelayBoard8Serial
                                       RJCP.IO.Ports.StopBits.One,
                                       RJCP.IO.Ports.Parity.None,
                                       DataBits.Eight);
-                _Serial.Value.Connect();
-                //setup & collect boards
-                _Serial.Value.MessageReceived += Setup_MessageReceived;
-                SendMessage(SendCommand.SETUP, 1, 0);
-                await _SilenceWaiter.Wait(1500);
-                _Serial.Value.MessageReceived -= Setup_MessageReceived;
-                //disable all
-                SendMessage(SendCommand.SET_PORT, 0, 0);
-                //register message reciever
-                _Serial.Value.MessageReceived += Serial_MessageReceived;
-                //prevent double initialization
-                _Initialized = true;
+                if (_Serial.Value.Connect())
+                {
+                    //setup & collect boards
+                    _Serial.Value.MessageReceived += Setup_MessageReceived;
+                    SendMessage(SendCommand.SETUP, 1, 0);
+                    await _SilenceWaiter.Wait(1500);
+                    _Serial.Value.MessageReceived -= Setup_MessageReceived;
+                    if (Boards.Value.Count > 0)
+                    {
+                        //disable all
+                        SendMessage(SendCommand.SET_PORT, 0, 0);
+                        //register message reciever
+                        _Serial.Value.MessageReceived += Serial_MessageReceived;
+                        //prevent double initialization
+                        _Initialized = true;
+                    }
+                    else //no boaards detected
+                    {
+                        if(_Serial.Value.IsConnected)
+                        {
+                            _Serial.Value.Disconnect();
+                        }
+                    }
+                }
             }
+            return _Initialized;
         }
 
         private bool SendMessage(SendCommand command, ushort address, byte data)

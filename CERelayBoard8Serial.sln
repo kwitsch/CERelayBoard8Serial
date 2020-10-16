@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CERelayBoard8Serial", "CERelayBoard8Serial\CERelayBoard8Serial.csproj", "{193CD476-8506-4787-966D-866788589573}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CERelayBoard8Serial.Test", "CERelayBoard8Serial.Test\CERelayBoard8Serial.Test.csproj", "{0C4C8D74-B2DA-499A-BB11-AD52271C710D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CERelayBoard8Serial.Test", "CERelayBoard8Serial.Test\CERelayBoard8Serial.Test.csproj", "{0C4C8D74-B2DA-499A-BB11-AD52271C710D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
-﻿using CERelayBoard8Serial.Utils;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using CERelayBoard8Serial.Utils;
 
 namespace CERelayBoard8Serial
 {

@@ -11,7 +11,7 @@ namespace CERelayBoard8Serial
 
         static Factory()
         {
-            _Instance = new Lazy<Factory>();
+            _Instance = new Lazy<Factory>(new Factory());
         }
         #endregion
 
