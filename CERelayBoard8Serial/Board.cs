@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -70,7 +71,40 @@ namespace CERelayBoard8Serial
 
         private void SetData(ushort relay, bool state)
         {
-
+            _Data.Value[relay] = state;
         }
+
+        #region Converters
+        private byte DataToByte()
+        {
+            var res = new byte[1];
+            var d = new BitArray(new bool[]
+            {
+                _Data.Value[1],
+                _Data.Value[2],
+                _Data.Value[3],
+                _Data.Value[4],
+                _Data.Value[5],
+                _Data.Value[6],
+                _Data.Value[7],
+                _Data.Value[8],
+            });
+            d.CopyTo(res, 0);
+            return res[0];
+        }
+
+        internal void ByteToData(byte data)
+        {
+            var d = new BitArray(new byte[] { data });
+            _Data.Value[1] = d[0];
+            _Data.Value[2] = d[1];
+            _Data.Value[3] = d[2];
+            _Data.Value[4] = d[3];
+            _Data.Value[5] = d[4];
+            _Data.Value[6] = d[5];
+            _Data.Value[7] = d[6];
+            _Data.Value[8] = d[7];
+        }
+        #endregion
     }
 }
